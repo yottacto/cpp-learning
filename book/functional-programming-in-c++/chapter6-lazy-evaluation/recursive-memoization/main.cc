@@ -29,6 +29,9 @@ namespace detail
         template <class... InnerArgs>
         Result operator()(InnerArgs&&... args) const
         {
+            std::unique_lock<std::recursive_mutex>
+                lock{cache_mutex};
+
             auto args_tuple = std::make_tuple(args...);
             auto cached = cache.find(args_tuple);
 
@@ -62,7 +65,9 @@ memorize_helper<Sig, F> make_memoized_r(F&& f)
 int main()
 {
     {
-        auto r = make_memoized_r<unsigned int(unsigned int)>([](auto& fib, unsigned int n) {
+        auto r = make_memoized_r<
+           unsigned int(unsigned int)
+        >([](auto& fib, unsigned int n) {
             std::cout << "Calculating [n = " << n << "]\n";
             return n <= 1
                 ? n

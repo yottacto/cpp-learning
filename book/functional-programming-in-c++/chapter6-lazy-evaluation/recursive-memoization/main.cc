@@ -49,18 +49,20 @@ namespace detail
         mutable std::map<args_tuple_type, Result> cache;
         mutable std::recursive_mutex cache_mutex;
     };
+}
 
-    template <class Sig, class F>
-    memorize_helper<Sig, F> make_memoized_r(F&& f)
-    {
-        return {std::forward<F>(f)};
-    }
+using detail::memorize_helper;
+
+template <class Sig, class F>
+memorize_helper<Sig, F> make_memoized_r(F&& f)
+{
+    return {std::forward<F>(f)};
 }
 
 int main()
 {
     {
-        auto r = detail::make_memoized_r<unsigned int(unsigned int)>([](auto& fib, unsigned int n) {
+        auto r = make_memoized_r<unsigned int(unsigned int)>([](auto& fib, unsigned int n) {
             std::cout << "Calculating [n = " << n << "]\n";
             return n <= 1
                 ? n
